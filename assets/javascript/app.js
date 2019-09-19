@@ -1,8 +1,8 @@
 // We'll put some global variables here.
-let trainName;
-let destination;
-let firstTrainTime;
-let frequency;
+let trainNameText = "";
+let destinationText = "";
+let firstTrainTimeText = "";
+let frequencyText = "";
 
 $(document).ready(function(){
     var firebaseConfig = {
@@ -17,14 +17,23 @@ $(document).ready(function(){
       // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
 
+    var database = firebase.database();
 
     $("#submitBtn").on("click", function(event){
         event.preventDefault();
-        trainName = $("#trainNameInput").val().trim();
-        destination = $("#destinationInput").val().trim();
-        firstTrainTime = $("#firstTrainTimeInput").val().trim();
-        frequency = $("#frequencyInput").val().trim();
-        console.log(trainName + " " + destination + " " + firstTrainTime + " " + frequency);
-    });
+        trainNameText = $("#trainNameInput").val().trim();
+        destinationText = $("#destinationInput").val().trim();
+        firstTrainTimeText = $("#firstTrainTimeInput").val().trim();
+        frequencyText = $("#frequencyInput").val().trim();
 
+        var trainInfo = {
+            name: trainNameText,
+            destination: destinationText,
+            firstTime: firstTrainTimeText,
+            frequency: frequencyText
+        };
+
+        console.log(trainInfo);
+        database.ref().push(trainInfo);
+    });
 });
