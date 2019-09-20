@@ -24,6 +24,7 @@ $(document).ready(function(){
         console.log(snapshot.val());
         var numberCheckValues = snapshot.val();
         numberCheck = numberCheckValues.trainIndex;
+        console.log("numberCheck: " + numberCheck);
     })
 
     $("#submitBtn").on("click", function(event){
@@ -59,26 +60,27 @@ $(document).ready(function(){
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
         var tRemainder = diffTime % trainSnapshot.frequency;
         var tMinutesTillTrain = trainSnapshot.frequency - tRemainder;
-        var colMinTill = $("<td scope='col' id='" + trainSnapshot.id + "min'>").text(tMinutesTillTrain);
+        var colMinTill = $("<td scope='col'>").text(tMinutesTillTrain);
         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-        var colNextArrival = $("<td scope='col' id='" + trainSnapshot.id + "arrival'>").text(moment(nextTrain).format("hh:mm"));
+        var colNextArrival = $("<td scope='col'>").text(moment(nextTrain).format("hh:mm"));
         newRow.append(colName).append(colDestination).append(colFrequency).append(colNextArrival).append(colMinTill);
         $("#trainData").append(newRow);
     });
 
-    // var updateInterval = setInterval(updateTimes,60000);
+    var updateInterval = setInterval(updateTimes,5000);
 
-    // function updateTimes() {
-    //     database.ref().on("value", function(snapshot) {
-    //         refreshSnapshot = snapshot.val();
-    //         console.log(refreshSnapshot);
-    //         var firstTimeConverted = moment(refreshSnapshot.firstTime, "HH:mm").subtract(1, "years");
-    //         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    //         var tRemainder = diffTime % refreshSnapshot.frequency;
-    //         var tMinutesTillTrain = refreshSnapshot.frequency - tRemainder;
-    //         $("#" + refreshSnapshot.id + "min").text(tMinutesTillTrain);
-    //         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-    //         $("#" + refreshSnapshot.id + "arrival").text(moment(nextTrain).format("hh:mm"));
-    //     });
-    // };   
+    function updateTimes() {
+        for (var i = 0; i < numberCheck; i++) {
+            var refreshFirstTime = $("tr[data-id='" + i + "']").attr("data-first-train");
+            var refreshFrequency = $("tr[data-id='" + i + "']").attr("data-frequency");
+            console.log(refreshFirstTime + refreshFrequency);
+            // var firstTimeConverted = moment(refreshSnapshot.firstTime, "HH:mm").subtract(1, "years");
+            // var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+            // var tRemainder = diffTime % refreshSnapshot.frequency;
+            // var tMinutesTillTrain = refreshSnapshot.frequency - tRemainder;
+            // $("#" + refreshSnapshot.id + "min").text(tMinutesTillTrain);
+            // var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+            // $("#" + refreshSnapshot.id + "arrival").text(moment(nextTrain).format("hh:mm"));
+        };
+    }; 
 });
