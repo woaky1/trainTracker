@@ -1,0 +1,13 @@
+body {
+    /* Background pattern from Toptal Subtle Patterns */
+    background-image: url(../images/ricepaper_v3/ricepaper_v3_@2X.png);
+    font-family: 'Special Elite', cursive;
+}
+
+.card-header {
+    background-color: #d6c9a3;
+}
+
+.card-body {
+    background-color: #f7eed2;
+}

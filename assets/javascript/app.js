@@ -33,17 +33,16 @@ $(document).ready(function(){
             frequency: frequencyText
         };
 
-        console.log(trainInfo);
         database.ref().push(trainInfo);
     });
 
     database.ref().on("child_added", function(snapshot) {
         trainSnapshot = snapshot.val();
-        console.log(trainSnapshot);
         var newRow = $("<tr>");
         var colName = $("<td scope='col'>").text(trainSnapshot.name);
         var colDestination = $("<td scope='col'>").text(trainSnapshot.destination);
         var colFrequency = $("<td scope='col'>").text(trainSnapshot.frequency);
+        // The next sevem lines of code are based on the exercises we did in class (Modul 7, exercise 21).
         var firstTimeConverted = moment(trainSnapshot.firstTime, "HH:mm").subtract(1, "years");
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
         var tRemainder = diffTime % trainSnapshot.frequency;
