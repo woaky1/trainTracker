@@ -1,9 +1,11 @@
 body {
     /* Background pattern from Toptal Subtle Patterns */
     background-image: url(../images/ricepaper_v3/ricepaper_v3_@2X.png);
+    /* This is the old-timey font we got from Google Fonts */
     font-family: 'Special Elite', cursive;
 }
 
+/* These two classes are to give our help give our tables an old weathered paper look. */
 .card-header {
     background-color: #d6c9a3;
 }
