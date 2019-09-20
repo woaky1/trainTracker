@@ -3,6 +3,7 @@ let trainNameText = "";
 let destinationText = "";
 let firstTrainTimeText = "";
 let frequencyText = "";
+let trainIndexNumber = 0;
 
 $(document).ready(function(){
     var firebaseConfig = {
@@ -19,24 +20,38 @@ $(document).ready(function(){
 
     var database = firebase.database();
 
+    database.ref().on("value", function(snapshot){
+        indexCheck = snapshot.val();
+        console.log("indexCheck: " + indexCheck);
+        if (indexCheck.trainIndex !== true) {
+            trainIndexNumber = 0;
+        } else {
+            trainIndexNumber = indexCheck.trainIndex;
+        }
+    })
+
     $("#submitBtn").on("click", function(event){
         event.preventDefault();
         trainNameText = $("#trainNameInput").val().trim();
         destinationText = $("#destinationInput").val().trim();
         firstTrainTimeText = $("#firstTrainTimeInput").val().trim();
         frequencyText = $("#frequencyInput").val().trim();
-
         var trainInfo = {
             name: trainNameText,
             destination: destinationText,
             firstTime: firstTrainTimeText,
             frequency: frequencyText,
+            itemNum: trainIndexNumber
         };
 
-        database.ref().push(trainInfo);
+        database.ref("/trains").push(trainInfo);
+
+        trainIndexNumber++;
+
+        database.ref().set("trainIndex", trainIndexNumber);
     });
 
-    database.ref().on("child_added", function(snapshot) {
+    database.ref("/trains").on("child_added", function(snapshot) {
         trainSnapshot = snapshot.val();
         console.log(trainSnapshot);
         var newRow = $("<tr>");
@@ -57,7 +72,7 @@ $(document).ready(function(){
 
     var updateInterval = setInterval(updateTimes,60000);
     function updateTimes() {
-        database.ref().on("child_added", function(snapshot) {
+        database.ref("/trains").on("child_added", function(snapshot) {
             refreshSnapshot = snapshot.val();
             console.log(refreshSnapshot);
             var firstTimeConverted = moment(refreshSnapshot.firstTime, "HH:mm").subtract(1, "years");
