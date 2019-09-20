@@ -60,14 +60,14 @@ $(document).ready(function(){
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
         var tRemainder = diffTime % trainSnapshot.frequency;
         var tMinutesTillTrain = trainSnapshot.frequency - tRemainder;
-        var colMinTill = $("<td scope='col'>").text(tMinutesTillTrain);
+        var colMinTill = $("<td scope='col' id='" + trainSnapshot.id + "min'>").text(tMinutesTillTrain);
         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-        var colNextArrival = $("<td scope='col'>").text(moment(nextTrain).format("hh:mm"));
+        var colNextArrival = $("<td scope='col' id='" + trainSnapshot.id + "arrival'>").text(moment(nextTrain).format("hh:mm"));
         newRow.append(colName).append(colDestination).append(colFrequency).append(colNextArrival).append(colMinTill);
         $("#trainData").append(newRow);
     });
 
-    var updateInterval = setInterval(updateTimes,5000);
+    var updateInterval = setInterval(updateTimes,60000);
 
     function updateTimes() {
         for (var i = 0; i < numberCheck; i++) {
@@ -78,9 +78,10 @@ $(document).ready(function(){
             var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
             var tRemainder = diffTime % refreshFrequency;
             var tMinutesTillTrain = refreshFrequency - tRemainder;
-            $("#" + refreshSnapshot.id + "min").text(tMinutesTillTrain);
             var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-            $("#" + refreshSnapshot.id + "arrival").text(moment(nextTrain).format("hh:mm"));
+            $("#" + i + "min").text(tMinutesTillTrain);
+            var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+            $("#" + i + "arrival").text(moment(nextTrain).format("hh:mm"));
         };
     }; 
 });
