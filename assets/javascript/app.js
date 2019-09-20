@@ -3,7 +3,7 @@ let trainNameText = "";
 let destinationText = "";
 let firstTrainTimeText = "";
 let frequencyText = "";
-let trainIndexNumber = 0;
+var numberCheck;
 
 $(document).ready(function(){
     var firebaseConfig = {
@@ -19,15 +19,11 @@ $(document).ready(function(){
       firebase.initializeApp(firebaseConfig);
 
     var database = firebase.database();
-
-    database.ref().on("value", function(snapshot){
-        indexCheck = snapshot.val();
-        console.log("indexCheck: " + indexCheck);
-        if (indexCheck.trainIndex !== true) {
-            trainIndexNumber = 0;
-        } else {
-            trainIndexNumber = indexCheck.trainIndex;
-        }
+    
+    database.ref().on("value", function(snapshot) {
+        console.log(snapshot.val());
+        var numberCheckValues = snapshot.val();
+        numberCheck = numberCheckValues.trainIndex;
     })
 
     $("#submitBtn").on("click", function(event){
@@ -41,14 +37,14 @@ $(document).ready(function(){
             destination: destinationText,
             firstTime: firstTrainTimeText,
             frequency: frequencyText,
-            itemNum: trainIndexNumber
+            id: numberCheck
         };
 
         database.ref("/trains").push(trainInfo);
-
-        trainIndexNumber++;
-
-        database.ref().set("trainIndex", trainIndexNumber);
+        numberCheck++;
+        database.ref().set({
+            trainIndex: numberCheck
+        });
     });
 
     database.ref("/trains").on("child_added", function(snapshot) {
@@ -63,25 +59,26 @@ $(document).ready(function(){
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
         var tRemainder = diffTime % trainSnapshot.frequency;
         var tMinutesTillTrain = trainSnapshot.frequency - tRemainder;
-        var colMinTill = $("<td scope='col' class='minTill'>").text(tMinutesTillTrain);
+        var colMinTill = $("<td scope='col' id='" + trainSnapshot.id + "min'>").text(tMinutesTillTrain);
         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-        var colNextArrival = $("<td scope='col' class='arrival'>").text(moment(nextTrain).format("hh:mm"));
+        var colNextArrival = $("<td scope='col' id='" + trainSnapshot.id + "arrival'>").text(moment(nextTrain).format("hh:mm"));
         newRow.append(colName).append(colDestination).append(colFrequency).append(colNextArrival).append(colMinTill);
         $("#trainData").append(newRow);
     });
 
     var updateInterval = setInterval(updateTimes,60000);
+
     function updateTimes() {
-        database.ref("/trains").on("child_added", function(snapshot) {
+        database.ref().on("value", function(snapshot) {
             refreshSnapshot = snapshot.val();
             console.log(refreshSnapshot);
             var firstTimeConverted = moment(refreshSnapshot.firstTime, "HH:mm").subtract(1, "years");
             var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
             var tRemainder = diffTime % refreshSnapshot.frequency;
             var tMinutesTillTrain = refreshSnapshot.frequency - tRemainder;
-            $(".minTill").text(tMinutesTillTrain);
+            $("#" + refreshSnapshot.id + "min").text(tMinutesTillTrain);
             var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-            $(".arrival").text(moment(nextTrain).format("hh:mm"));
+            $("#" + refreshSnapshot.id + "arrival").text(moment(nextTrain).format("hh:mm"));
         });
     };   
 });
