@@ -30,7 +30,7 @@ $(document).ready(function(){
             name: trainNameText,
             destination: destinationText,
             firstTime: firstTrainTimeText,
-            frequency: frequencyText
+            frequency: frequencyText,
         };
 
         database.ref().push(trainInfo);
@@ -38,19 +38,35 @@ $(document).ready(function(){
 
     database.ref().on("child_added", function(snapshot) {
         trainSnapshot = snapshot.val();
+        console.log(trainSnapshot);
         var newRow = $("<tr>");
         var colName = $("<td scope='col'>").text(trainSnapshot.name);
         var colDestination = $("<td scope='col'>").text(trainSnapshot.destination);
         var colFrequency = $("<td scope='col'>").text(trainSnapshot.frequency);
-        // The next sevem lines of code are based on the exercises we did in class (Modul 7, exercise 21).
+        // The next seven lines of code are based on the exercises we did in class (Modul 7, exercise 21).
         var firstTimeConverted = moment(trainSnapshot.firstTime, "HH:mm").subtract(1, "years");
         var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
         var tRemainder = diffTime % trainSnapshot.frequency;
         var tMinutesTillTrain = trainSnapshot.frequency - tRemainder;
-        var colMinTill = $("<td scope='col'>").text(tMinutesTillTrain);
+        var colMinTill = $("<td scope='col' class='minTill'>").text(tMinutesTillTrain);
         var nextTrain = moment().add(tMinutesTillTrain, "minutes");
-        var colNextArrival = $("<td scope='col'>").text(moment(nextTrain).format("hh:mm"));
+        var colNextArrival = $("<td scope='col' class='arrival'>").text(moment(nextTrain).format("hh:mm"));
         newRow.append(colName).append(colDestination).append(colFrequency).append(colNextArrival).append(colMinTill);
         $("#trainData").append(newRow);
     });
+
+    var updateInterval = setInterval(updateTimes,60000);
+    function updateTimes() {
+        database.ref().on("child_added", function(snapshot) {
+            refreshSnapshot = snapshot.val();
+            console.log(refreshSnapshot);
+            var firstTimeConverted = moment(refreshSnapshot.firstTime, "HH:mm").subtract(1, "years");
+            var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+            var tRemainder = diffTime % refreshSnapshot.frequency;
+            var tMinutesTillTrain = refreshSnapshot.frequency - tRemainder;
+            $(".minTill").text(tMinutesTillTrain);
+            var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+            $(".arrival").text(moment(nextTrain).format("hh:mm"));
+        });
+    };   
 });
